@@ -1,0 +1,15 @@
+{
+  "name": "GUGE — Travel Ethiopia. Buy Ethiopia.",
+  "short_name": "GUGE",
+  "description": "A digital gateway to Ethiopian culture, travel, and authentic local products.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#faf6ef",
+  "theme_color": "#0d5c43",
+  "icons": [
+    { "src": "/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "/icon-512.png", "sizes": "512x512", "type": "image/png" }
+  ],
+  "categories": ["travel", "shopping", "lifestyle"],
+  "lang": "en"
+}
