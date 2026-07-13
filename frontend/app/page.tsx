@@ -7,6 +7,8 @@ import { HeroSection } from '@/components/sections/HeroSection';
 import { SearchBar } from '@/components/sections/SearchBar';
 import Link from 'next/link';
 
+const FEATURED_HERO_IMAGE = 'https://upload.wikimedia.org/wikipedia/commons/thumb/a/aa/Lalibela%2C_san_giorgio%2C_esterno_24.jpg/1600px-Lalibela%2C_san_giorgio%2C_esterno_24.jpg';
+
 export const revalidate = 3600; // ISR: rebuild every hour
 
 export default async function HomePage() {
@@ -23,7 +25,7 @@ export default async function HomePage() {
   return (
     <>
       {/* ── HERO ── */}
-      <HeroSection regions={regions.slice(0, 5)} />
+      <HeroSection regions={regions.slice(0, 5)} heroImage={FEATURED_HERO_IMAGE} />
 
       {/* ── SEARCH ── */}
       <div className="bg-ink px-10 py-7">

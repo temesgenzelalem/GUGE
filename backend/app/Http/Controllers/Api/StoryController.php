@@ -2,55 +2,84 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Domain\Story\Contracts\StoryServiceInterface;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\StoreStoryRequest;
+use App\Http\Requests\UpdateStoryRequest;
+use App\Http\Resources\StoryCollection;
+use App\Http\Resources\StoryResource;
 use App\Models\Story;
-use Illuminate\Http\Request;
+use App\Support\ApiResponse;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 
 class StoryController extends Controller
 {
-    /** GET /api/stories */
-    public function index(Request $request): JsonResponse
+    public function __construct(protected StoryServiceInterface $storyService)
     {
-        $query = Story::with(['region', 'creator']);
-
-        if ($request->filled('type')) {
-            $query->where('type', $request->type);
-        }
-
-        if ($request->filled('region_id')) {
-            $query->where('region_id', $request->integer('region_id'));
-        }
-
-        if ($request->filled('search')) {
-            $q = $request->search;
-            $query->where(function ($b) use ($q) {
-                $b->whereRaw('title ILIKE ?', ["%{$q}%"])
-                  ->orWhereRaw('excerpt ILIKE ?', ["%{$q}%"]);
-            });
-        }
-
-        $stories = $query
-            ->orderBy('published_at', 'desc')
-            ->paginate($request->integer('per_page', 12));
-
-        return response()->json($stories);
+        $this->middleware('auth:sanctum')->only(['store', 'update', 'destroy']);
+        $this->authorizeResource(Story::class, 'story', ['except' => ['index', 'show', 'incrementView']]);
     }
 
-    /** GET /api/stories/{slug} */
+    public function index(Request $request): JsonResponse
+    {
+        $stories = $this->storyService->listStories(
+            $request->only(['category', 'type', 'region_id', 'creator_id', 'status', 'search']),
+            $request->integer('per_page', 12)
+        );
+
+        return ApiResponse::success(new StoryCollection($stories), 'Stories retrieved successfully', [
+            'current_page' => $stories->currentPage(),
+            'per_page' => $stories->perPage(),
+            'total' => $stories->total(),
+            'last_page' => $stories->lastPage(),
+        ], [
+            'next' => $stories->nextPageUrl(),
+            'prev' => $stories->previousPageUrl(),
+        ]);
+    }
+
+    public function store(StoreStoryRequest $request): JsonResponse
+    {
+        $story = $this->storyService->createStory($request->validated());
+
+        return ApiResponse::success(new StoryResource($story), 'Story created successfully', [], [], 201);
+    }
+
     public function show(Story $story): JsonResponse
     {
-        $story->load(['region', 'creator']);
+        $this->authorize('view', $story);
 
-        $related = Story::with(['region', 'creator'])
-            ->where('id', '!=', $story->id)
-            ->where('region_id', $story->region_id)
-            ->limit(3)
-            ->get();
+        $story = $this->storyService->getStory($story);
+        $related = $this->storyService->getRelatedStories($story, 3);
 
-        return response()->json([
-            'data'    => $story,
-            'related' => $related,
-        ]);
+        return ApiResponse::success([
+            'data' => new StoryResource($story),
+            'related' => StoryResource::collection($related),
+        ], 'Story retrieved successfully');
+    }
+
+    public function update(UpdateStoryRequest $request, Story $story): JsonResponse
+    {
+        $story = $this->storyService->updateStory($story, $request->validated());
+
+        return ApiResponse::success(new StoryResource($story), 'Story updated successfully');
+    }
+
+    public function destroy(Story $story): JsonResponse
+    {
+        $this->storyService->deleteStory($story);
+
+        return ApiResponse::success(null, 'Story deleted successfully');
+    }
+
+    public function incrementView(Story $story): JsonResponse
+    {
+        $this->storyService->incrementViewCount($story);
+
+        return ApiResponse::success(
+            ['view_count' => $story->fresh()->view_count],
+            'View count updated'
+        );
     }
 }

@@ -1,7 +1,7 @@
 <?php
 
 use Illuminate\Contracts\Http\Kernel;
-use Illuminate\Foundation\Http\Kernel as FoundationHttpKernel;
+use Illuminate\Http\Request;
 
 require __DIR__.'/../vendor/autoload.php';
 
@@ -11,7 +11,7 @@ $app = require_once __DIR__.'/../bootstrap/app.php';
 $kernel = $app->make(Kernel::class);
 
 $response = $kernel->handle(
-    $request = Illuminate\Http\Request::capture()
+    $request = Request::capture()
 );
 
 $response->send();

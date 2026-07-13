@@ -46,17 +46,35 @@ CREATE INDEX idx_regions_tags      ON regions USING GIN (tags);
 -- ═══════════════════════════════════════════════════════════════
 CREATE TABLE creators (
     id               SERIAL PRIMARY KEY,
-    name             VARCHAR(120) NOT NULL,
+    name             VARCHAR(200),
+    full_name        VARCHAR(200) NOT NULL,
+    username         VARCHAR(100) UNIQUE,
     slug             VARCHAR(140) NOT NULL UNIQUE,
-    role             VARCHAR(120) NOT NULL,
-    bio              TEXT         NOT NULL,
-    region_coverage  VARCHAR(200) NOT NULL,
-    wiki_article     VARCHAR(220) NOT NULL,
-    image_url        TEXT,
+    region_id        INTEGER REFERENCES regions(id) ON DELETE SET NULL,
+    role             VARCHAR(120),
+    bio              TEXT,
+    status           VARCHAR(40) NOT NULL DEFAULT 'published',
+    specialties      JSONB,
+    languages        JSONB,
+    social_links     JSONB,
     contact_email    VARCHAR(180),
+    website_url      TEXT,
+    portfolio_url    TEXT,
+    wiki_article     VARCHAR(220),
+    image_url        TEXT,
+    rating           NUMERIC(3,2) NOT NULL DEFAULT 0,
+    review_count     INTEGER NOT NULL DEFAULT 0,
+    story_count      INTEGER NOT NULL DEFAULT 0,
+    product_count    INTEGER NOT NULL DEFAULT 0,
+    meta_title       VARCHAR(120),
+    meta_description TEXT,
     created_at       TIMESTAMPTZ  NOT NULL DEFAULT NOW(),
-    updated_at       TIMESTAMPTZ  NOT NULL DEFAULT NOW()
+    updated_at       TIMESTAMPTZ  NOT NULL DEFAULT NOW(),
+    deleted_at       TIMESTAMPTZ
 );
+
+CREATE INDEX idx_creators_slug   ON creators (slug);
+CREATE INDEX idx_creators_region ON creators (region_id);
 
 -- ═══════════════════════════════════════════════════════════════
 --  TABLE: products
@@ -279,15 +297,15 @@ INSERT INTO regions (name, slug, zone, direction, description, tagline, wiki_art
 -- ═══════════════════════════════════════════════════════════════
 --  SEED: CREATORS (8 creators)
 -- ═══════════════════════════════════════════════════════════════
-INSERT INTO creators (name, slug, role, bio, region_coverage, wiki_article) VALUES
-('Dawit Abebe','dawit-abebe','Documentary photographer','Addis-born photographer spending months each year embedded in coffee-farming communities across Yirgacheffe and Jimma. His work has appeared in National Geographic and BBC Travel.','Yirgacheffe & Jimma','Coffee_production_in_Ethiopia'),
-('Amina Suleiman','amina-suleiman','Visual storyteller','Born inside the Jugol walls. Documents everyday life of Harari women — the weavers, the coffee sellers, and the hyena keepers at the city gate at dusk.','Harar','Harar'),
-('Tigist Alemu','tigist-alemu','Culture writer & historian','Historian and essayist specializing in Ethiopian Orthodox heritage. Author of three books on Gondarine architecture and the role of the church in highland life.','Gondar & Lalibela','Fasil_Ghebbi'),
-('Bekele Worku','bekele-worku','Artisan weaver & seller','Third-generation Dorze master weaver from the Gamo highlands. His family has woven shemma cotton for 80 years. Ships directly to diaspora buyers in Europe and North America.','Wolayta (Dorze)','Dorze_people'),
-('Fatuma Abdullahi','fatuma-abdullahi','Master basket weaver','Third-generation Harari basket weaver whose family patterns are among the most recognized in the region. Teaches the craft to Harari schoolgirls each weekend.','Harar','Harar'),
-('Yonas Tesfaye','yonas-tesfaye','Travel writer & guide','Grew up in Arba Minch. Has spent 12 years guiding anthropologists, photographers and travelers through the Omo Valley''s 16 ethnic communities.','Omo Valley','Omo_Valley'),
-('Mulu Haile','mulu-haile','Beekeeper & honey producer','Traditional log-hive beekeeper in the Tigray escarpment. Harvests twice yearly, seals in beeswax, and ships raw dark honey to a small international network of buyers.','Tigray highlands','Beekeeping_in_Ethiopia'),
-('Selam Girma','selam-girma','Food producer & storyteller','Wolayta farmer and community educator who documents the enset food system — kocho, bulla, amicho — and advocates for its recognition as a UNESCO food heritage.','Wolayta, South Ethiopia','Ensete_ventricosum');
+INSERT INTO creators (name, full_name, slug, role, bio, wiki_article) VALUES
+('Dawit Abebe','Dawit Abebe','dawit-abebe','Documentary photographer','Addis-born photographer spending months each year embedded in coffee-farming communities across Yirgacheffe and Jimma. His work has appeared in National Geographic and BBC Travel.','Coffee_production_in_Ethiopia'),
+('Amina Suleiman','Amina Suleiman','amina-suleiman','Visual storyteller','Born inside the Jugol walls. Documents everyday life of Harari women — the weavers, the coffee sellers, and the hyena keepers at the city gate at dusk.','Harar'),
+('Tigist Alemu','tigist-alemu','Culture writer & historian','Historian and essayist specializing in Ethiopian Orthodox heritage. Author of three books on Gondarine architecture and the role of the church in highland life.','Fasil_Ghebbi'),
+('Bekele Worku','bekele-worku','Artisan weaver & seller','Third-generation Dorze master weaver from the Gamo highlands. His family has woven shemma cotton for 80 years. Ships directly to diaspora buyers in Europe and North America.','Dorze_people'),
+('Fatuma Abdullahi','fatuma-abdullahi','Master basket weaver','Third-generation Harari basket weaver whose family patterns are among the most recognized in the region. Teaches the craft to Harari schoolgirls each weekend.','Harar'),
+('Yonas Tesfaye','yonas-tesfaye','Travel writer & guide','Grew up in Arba Minch. Has spent 12 years guiding anthropologists, photographers and travelers through the Omo Valley''s 16 ethnic communities.','Omo_Valley'),
+('Mulu Haile','mulu-haile','Beekeeper & honey producer','Traditional log-hive beekeeper in the Tigray escarpment. Harvests twice yearly, seals in beeswax, and ships raw dark honey to a small international network of buyers.','Beekeeping_in_Ethiopia'),
+('Selam Girma','selam-girma','Food producer & storyteller','Wolayta farmer and community educator who documents the enset food system — kocho, bulla, amicho — and advocates for its recognition as a UNESCO food heritage.','Ensete_ventricosum');
 
 -- ═══════════════════════════════════════════════════════════════
 --  SEED: PRODUCTS (32 products)

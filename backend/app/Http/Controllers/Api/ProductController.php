@@ -2,60 +2,74 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Domain\Product\Contracts\ProductServiceInterface;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\StoreProductRequest;
+use App\Http\Requests\UpdateProductRequest;
+use App\Http\Resources\ProductCollection;
+use App\Http\Resources\ProductResource;
 use App\Models\Product;
-use Illuminate\Http\Request;
+use App\Support\ApiResponse;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 
 class ProductController extends Controller
 {
+    public function __construct(protected ProductServiceInterface $productService)
+    {
+        $this->middleware('auth:sanctum')->only(['store', 'update', 'destroy']);
+        $this->authorizeResource(Product::class, 'product', ['except' => ['index', 'show']]);
+    }
+
     /** GET /api/products */
     public function index(Request $request): JsonResponse
     {
-        $query = Product::with('region');
+        $products = $this->productService->listProducts($request->only(['category', 'region_id', 'search']), $request->integer('per_page', 20));
 
-        if ($request->filled('category')) {
-            $query->where('category', $request->category);
-        }
+        return ApiResponse::success(new ProductCollection($products), 'Products retrieved successfully', [
+            'current_page' => $products->currentPage(),
+            'per_page' => $products->perPage(),
+            'total' => $products->total(),
+            'last_page' => $products->lastPage(),
+        ], [
+            'next' => $products->nextPageUrl(),
+            'prev' => $products->previousPageUrl(),
+        ]);
+    }
 
-        if ($request->filled('region_id')) {
-            $query->where('region_id', $request->integer('region_id'));
-        }
+    /** POST /api/products */
+    public function store(StoreProductRequest $request): JsonResponse
+    {
+        $product = $this->productService->createProduct($request->validated());
 
-        if ($request->filled('search')) {
-            $q = $request->search;
-            $query->where(function ($b) use ($q) {
-                $b->whereRaw('name ILIKE ?', ["%{$q}%"])
-                  ->orWhereRaw('description ILIKE ?', ["%{$q}%"])
-                  ->orWhereRaw('story ILIKE ?', ["%{$q}%"]);
-            });
-        }
-
-        $products = $query
-            ->orderBy('name')
-            ->paginate($request->integer('per_page', 20));
-
-        return response()->json($products);
+        return ApiResponse::success(new ProductResource($product), 'Product created successfully', [], [], 201);
     }
 
     /** GET /api/products/{slug} */
     public function show(Product $product): JsonResponse
     {
-        $product->load('region');
+        $product = $this->productService->getProduct($product);
+        $related = $this->productService->getRelatedProducts($product, 4);
 
-        // Related products from same region or category
-        $related = Product::with('region')
-            ->where('id', '!=', $product->id)
-            ->where(function ($q) use ($product) {
-                $q->where('region_id', $product->region_id)
-                  ->orWhere('category', $product->category);
-            })
-            ->limit(4)
-            ->get();
+        return ApiResponse::success([
+            'data' => new ProductResource($product),
+            'related' => ProductResource::collection($related),
+        ], 'Product retrieved successfully');
+    }
 
-        return response()->json([
-            'data'    => $product,
-            'related' => $related,
-        ]);
+    /** PUT /api/products/{slug} */
+    public function update(UpdateProductRequest $request, Product $product): JsonResponse
+    {
+        $product = $this->productService->updateProduct($product, $request->validated());
+
+        return ApiResponse::success(new ProductResource($product), 'Product updated successfully');
+    }
+
+    /** DELETE /api/products/{slug} */
+    public function destroy(Product $product): JsonResponse
+    {
+        $this->productService->deleteProduct($product);
+
+        return ApiResponse::success(null, 'Product deleted successfully');
     }
 }

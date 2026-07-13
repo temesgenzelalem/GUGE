@@ -5,9 +5,10 @@ import type { Region } from '@/types';
 
 interface HeroSectionProps {
   regions: Region[];
+  heroImage?: string;
 }
 
-export function HeroSection({ regions }: HeroSectionProps) {
+export function HeroSection({ regions, heroImage }: HeroSectionProps) {
   return (
     <section className="relative min-h-[calc(100vh-60px)] grid grid-cols-1 lg:grid-cols-2 overflow-hidden bg-paper-2">
       {/* Left — content */}
@@ -49,8 +50,28 @@ export function HeroSection({ regions }: HeroSectionProps) {
         </div>
       </div>
 
-      {/* Right — mosaic of region images */}
+      {/* Right — featured image collage */}
       <div className="hidden lg:grid grid-cols-2 grid-rows-3 gap-1.5 p-5 pl-1.5 animate-fade-up-delay">
+        {heroImage ? (
+          <div className="relative col-span-2 row-span-3 overflow-hidden rounded-[14px]">
+            <WikiImage
+              src={heroImage}
+              alt="Lalibela rock-hewn church landscape"
+              dark
+              priority
+              className="min-h-full"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
+            <div className="absolute bottom-5 left-5 z-10 max-w-[320px]">
+              <p className="font-display text-[10px] font-bold tracking-[.2em] uppercase text-white/80 mb-2">
+                Featured destination
+              </p>
+              <h2 className="font-serif text-[26px] font-bold text-white leading-tight">
+                Lalibela, Ethiopia
+              </h2>
+            </div>
+          </div>
+        ) : null}
         {regions.map((region, i) => (
           <Link
             key={region.id}
