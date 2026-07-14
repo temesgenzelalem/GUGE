@@ -1,4 +1,4 @@
-import { getRegions, getProducts, getStories } from '@/lib/api';
+import { getRegions, getProducts, getStories, normalizeCollection } from '@/lib/api';
 import { WikiImage } from '@/components/ui/WikiImage';
 import { RegionCard } from '@/components/sections/RegionCard';
 import { ProductCard } from '@/components/sections/ProductCard';
@@ -18,9 +18,9 @@ export default async function HomePage() {
     getStories({ per_page: 6 }),
   ]);
 
-  const regions  = regionsRes.data;
-  const products = productsRes.data;
-  const stories  = storiesRes.data;
+  const regions  = normalizeCollection(regionsRes.data);
+  const products = normalizeCollection(productsRes.data);
+  const stories  = normalizeCollection(storiesRes.data);
 
   return (
     <>

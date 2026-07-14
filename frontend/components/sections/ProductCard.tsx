@@ -36,7 +36,7 @@ export function ProductCard({ product }: ProductCardProps) {
         <h3 className="font-serif text-[17px] font-bold text-ink leading-snug mb-2">{product.name}</h3>
         <p className="text-[12.5px] leading-relaxed text-ink-3 mb-3 line-clamp-2">{product.description}</p>
         <div className="flex gap-1.5 flex-wrap mb-3">
-          {product.tags.slice(0, 3).map((tag) => (
+          {(product.tags ?? []).slice(0, 3).map((tag) => (
             <span key={tag} className="font-display text-[9px] font-bold tracking-[0.1em] uppercase px-2 py-0.5 rounded-full bg-forest-3 text-forest">
               {tag}
             </span>

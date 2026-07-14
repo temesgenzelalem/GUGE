@@ -1,9 +1,10 @@
 'use client';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Search, Menu, X } from 'lucide-react';
-import { useState } from 'react';
+import { Menu, X } from 'lucide-react';
+import { useEffect, useState } from 'react';
 import { cn } from '@/lib/utils';
+import { useAuthStore } from '@/lib/auth';
 
 const NAV_LINKS = [
   { href: '/',            label: 'Explore'     },
@@ -16,6 +17,11 @@ const NAV_LINKS = [
 export function Navbar() {
   const pathname = usePathname();
   const [menuOpen, setMenuOpen] = useState(false);
+  const { isAuthenticated, hydrate, logout } = useAuthStore();
+
+  useEffect(() => {
+    hydrate();
+  }, [hydrate]);
 
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 h-[60px] flex items-center justify-between px-10 bg-paper/93 backdrop-blur-md border-b border-black/[0.08]">
@@ -45,12 +51,21 @@ export function Navbar() {
 
       {/* CTA + hamburger */}
       <div className="flex items-center gap-3">
-        <Link
-          href="/regions"
-          className="hidden md:block font-display text-[11.5px] font-bold tracking-wider uppercase px-4 py-2 bg-forest text-white rounded-md hover:bg-forest-2 transition-colors"
-        >
-          Discover Ethiopia
-        </Link>
+        {isAuthenticated ? (
+          <button
+            onClick={() => logout()}
+            className="hidden md:block font-display text-[11.5px] font-bold tracking-wider uppercase px-4 py-2 border border-black/10 rounded-md hover:bg-paper-2 transition-colors"
+          >
+            Logout
+          </button>
+        ) : (
+          <Link
+            href="/login"
+            className="hidden md:block font-display text-[11.5px] font-bold tracking-wider uppercase px-4 py-2 bg-forest text-white rounded-md hover:bg-forest-2 transition-colors"
+          >
+            Sign in
+          </Link>
+        )}
         <button
           className="md:hidden text-ink-2"
           onClick={() => setMenuOpen(!menuOpen)}
@@ -76,6 +91,15 @@ export function Navbar() {
               {label}
             </Link>
           ))}
+          {isAuthenticated ? (
+            <button onClick={() => { logout(); setMenuOpen(false); }} className="font-display text-[13px] font-semibold text-ink-2 py-1 text-left">
+              Logout
+            </button>
+          ) : (
+            <Link href="/login" onClick={() => setMenuOpen(false)} className="font-display text-[13px] font-semibold text-forest py-1">
+              Sign in
+            </Link>
+          )}
         </div>
       )}
     </nav>

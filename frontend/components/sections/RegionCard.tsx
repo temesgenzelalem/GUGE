@@ -27,8 +27,8 @@ export function RegionCard({ region, variant = 'tile' }: RegionCardProps) {
           <h3 className="font-serif text-[22px] font-bold text-white leading-tight mb-2">
             {region.name}
           </h3>
-          <div className="flex gap-1.5 flex-wrap">
-            {region.tags.slice(0, 2).map((tag) => (
+            <div className="flex gap-1.5 flex-wrap">
+            {(region.tags ?? []).slice(0, 2).map((tag) => (
               <span
                 key={tag}
                 className="font-display text-[9px] font-bold tracking-[0.1em] uppercase px-2 py-1 rounded-full bg-white/15 text-white/75 backdrop-blur-sm"
@@ -58,8 +58,8 @@ export function RegionCard({ region, variant = 'tile' }: RegionCardProps) {
         </p>
         <h3 className="font-serif text-[22px] font-bold text-ink mb-2">{region.name}</h3>
         <p className="text-[13px] leading-relaxed text-ink-3 mb-3 line-clamp-3">{region.description}</p>
-        <div className="flex gap-1.5 flex-wrap">
-          {region.tags.map((tag) => (
+          <div className="flex gap-1.5 flex-wrap">
+          {(region.tags ?? []).map((tag) => (
             <span
               key={tag}
               className="font-display text-[9px] font-bold tracking-[0.1em] uppercase px-2 py-0.5 rounded-full bg-forest-3 text-forest"

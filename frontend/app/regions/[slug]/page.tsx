@@ -28,8 +28,8 @@ export default async function RegionPage({ params }: Props) {
   if (!regionRes) notFound();
 
   const region   = regionRes.data;
-  const products = productsRes.data;
-  const stories  = storiesRes.data;
+  const products = normalizeCollection(productsRes.data);
+  const stories  = normalizeCollection(storiesRes.data);
 
   return (
     <>

@@ -19,7 +19,7 @@ const withFallback = async <T>(request: () => Promise<T>, fallback: T): Promise<
   }
 };
 
-const normalizeCollection = <T = unknown>(value: unknown): T[] => {
+export const normalizeCollection = <T = unknown>(value: unknown): T[] => {
   if (Array.isArray(value)) return value as T[];
   if (value == null) return [];
   if (typeof value === 'object') {
@@ -35,7 +35,7 @@ const normalizeCollection = <T = unknown>(value: unknown): T[] => {
   return [];
 };
 
-const normalizePayload = <T = unknown>(payload: unknown): { data: T[]; meta?: Record<string, unknown> } => {
+export const normalizePayload = <T = unknown>(payload: unknown): { data: T[]; meta?: Record<string, unknown> } => {
   if (payload && typeof payload === 'object') {
     const value = payload as Record<string, unknown>;
     if (Array.isArray(value)) {

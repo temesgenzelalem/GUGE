@@ -1,4 +1,4 @@
-import { getProducts } from '@/lib/api';
+import { getProducts, normalizeCollection } from '@/lib/api';
 import { ProductCard } from '@/components/sections/ProductCard';
 import { CategoryFilters } from '@/components/sections/CategoryFilters';
 
@@ -18,6 +18,8 @@ export default async function MarketplacePage({ searchParams }: Props) {
     per_page: 50,
   });
 
+  const products = normalizeCollection(res.data);
+
   return (
     <div className="px-10 py-14">
       <div className="mb-10">
@@ -36,12 +38,12 @@ export default async function MarketplacePage({ searchParams }: Props) {
       <CategoryFilters current={searchParams.category} />
 
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
-        {res.data.map((p) => (
-          <ProductCard key={p.id} product={p} />
-        ))}
+          {products.map((p) => (
+            <ProductCard key={p.id} product={p} />
+          ))}
       </div>
 
-      {res.data.length === 0 && (
+      {products.length === 0 && (
         <p className="font-body text-ink-3 py-20 text-center">
           No products found for this category.
         </p>

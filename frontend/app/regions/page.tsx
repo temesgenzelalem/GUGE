@@ -1,4 +1,4 @@
-import { getRegions } from '@/lib/api';
+import { getRegions, normalizeCollection } from '@/lib/api';
 import { RegionCard } from '@/components/sections/RegionCard';
 import { RegionFilters } from '@/components/sections/RegionFilters';
 
@@ -15,6 +15,8 @@ export default async function RegionsPage({ searchParams }: Props) {
     search:    searchParams.search,
     per_page:  50,
   });
+
+  const regions = normalizeCollection(res.data);
 
   return (
     <div className="px-10 py-14">
@@ -37,12 +39,12 @@ export default async function RegionsPage({ searchParams }: Props) {
 
       {/* Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
-        {res.data.map((region) => (
+        {regions.map((region) => (
           <RegionCard key={region.id} region={region} variant="full" />
         ))}
       </div>
 
-      {res.data.length === 0 && (
+      {regions.length === 0 && (
         <p className="text-center font-body text-ink-3 py-20">
           No regions found. Try a different filter.
         </p>

@@ -1,4 +1,4 @@
-import { getCreators } from '@/lib/api';
+import { getCreators, normalizeCollection } from '@/lib/api';
 import { WikiImage } from '@/components/ui/WikiImage';
 import Link from 'next/link';
 
@@ -7,14 +7,16 @@ export const metadata = { title: 'Creators — GUGE' };
 
 export default async function CreatorsPage() {
   const res = await getCreators({ per_page: 50 });
-  const featuredCreators = res.data.filter((creator) => {
+  const creators = normalizeCollection(res.data);
+
+  const featuredCreators = creators.filter((creator) => {
     const email = creator.contact_email?.toLowerCase() || '';
     return (
       email === 'temesgenzelalem167@gmail.com' ||
       creator.name.toLowerCase().includes('temesgen')
     );
   });
-  const creatorsToShow = featuredCreators.length > 0 ? featuredCreators : res.data;
+  const creatorsToShow = featuredCreators.length > 0 ? featuredCreators : creators;
 
   return (
     <div className="px-10 py-14">
