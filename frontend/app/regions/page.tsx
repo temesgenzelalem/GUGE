@@ -1,5 +1,6 @@
 import { getRegions, normalizeCollection } from '@/lib/api';
 import { RegionCard } from '@/components/sections/RegionCard';
+import type { Region } from '@/types';
 import { RegionFilters } from '@/components/sections/RegionFilters';
 
 export const revalidate = 3600;
@@ -16,7 +17,7 @@ export default async function RegionsPage({ searchParams }: Props) {
     per_page:  50,
   });
 
-  const regions = normalizeCollection(res.data);
+  const regions = normalizeCollection<Region>(res.data);
 
   return (
     <div className="px-10 py-14">

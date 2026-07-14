@@ -1,4 +1,5 @@
 import { getCreators, normalizeCollection } from '@/lib/api';
+import type { Creator } from '@/types';
 import { WikiImage } from '@/components/ui/WikiImage';
 import Link from 'next/link';
 
@@ -7,7 +8,7 @@ export const metadata = { title: 'Creators — GUGE' };
 
 export default async function CreatorsPage() {
   const res = await getCreators({ per_page: 50 });
-  const creators = normalizeCollection(res.data);
+  const creators = normalizeCollection<Creator>(res.data);
 
   const featuredCreators = creators.filter((creator) => {
     const email = creator.contact_email?.toLowerCase() || '';

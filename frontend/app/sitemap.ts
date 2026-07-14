@@ -1,15 +1,21 @@
 import { MetadataRoute } from 'next';
-import { getRegions, getProducts, getStories, getCreators } from '@/lib/api';
+import { getRegions, getProducts, getStories, getCreators, normalizeCollection } from '@/lib/api';
+import type { Region, Product, Story, Creator } from '@/types';
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const BASE = 'https://guge.et';
 
-  const [regions, products, stories, creators] = await Promise.all([
-    getRegions({ per_page: 100 }).then(r => r.data).catch(() => []),
-    getProducts({ per_page: 100 }).then(r => r.data).catch(() => []),
-    getStories({ per_page: 100 }).then(r => r.data).catch(() => []),
-    getCreators({ per_page: 100 }).then(r => r.data).catch(() => []),
+  const [regionsRes, productsRes, storiesRes, creatorsRes] = await Promise.all([
+    getRegions({ per_page: 100 }).catch(() => ({ data: [] })),
+    getProducts({ per_page: 100 }).catch(() => ({ data: [] })),
+    getStories({ per_page: 100 }).catch(() => ({ data: [] })),
+    getCreators({ per_page: 100 }).catch(() => ({ data: [] })),
   ]);
+
+  const regions = normalizeCollection<Region>(regionsRes.data);
+  const products = normalizeCollection<Product>(productsRes.data);
+  const stories = normalizeCollection<Story>(storiesRes.data);
+  const creators = normalizeCollection<Creator>(creatorsRes.data);
 
   const staticRoutes: MetadataRoute.Sitemap = [
     { url: BASE,                changeFrequency: 'daily',   priority: 1.0 },

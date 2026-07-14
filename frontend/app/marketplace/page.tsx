@@ -1,4 +1,5 @@
 import { getProducts, normalizeCollection } from '@/lib/api';
+import type { Product } from '@/types';
 import { ProductCard } from '@/components/sections/ProductCard';
 import { CategoryFilters } from '@/components/sections/CategoryFilters';
 
@@ -18,7 +19,7 @@ export default async function MarketplacePage({ searchParams }: Props) {
     per_page: 50,
   });
 
-  const products = normalizeCollection(res.data);
+  const products = normalizeCollection<Product>(res.data);
 
   return (
     <div className="px-10 py-14">

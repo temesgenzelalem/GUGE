@@ -3,6 +3,8 @@ import { WikiImage } from '@/components/ui/WikiImage';
 import { StoryCard } from '@/components/sections/StoryCard';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
+import { normalizeCollection } from '@/lib/api';
+import type { Story } from '@/types';
 
 export const revalidate = 3600;
 interface Props { params: { slug: string } }
@@ -81,11 +83,11 @@ export default async function CreatorPage({ params }: Props) {
       )}
 
       {/* Stories */}
-      {creator.stories && creator.stories.length > 0 && (
+      {normalizeCollection<Story>(creator.stories).length > 0 && (
         <section>
           <h2 className="font-serif text-[28px] font-bold mb-6">Stories by {creator.name}</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-            {creator.stories.map((s: any, i: number) => (
+            {normalizeCollection<Story>(creator.stories).map((s: any, i: number) => (
               <StoryCard key={s.id} story={s} featured={i === 0} />
             ))}
           </div>

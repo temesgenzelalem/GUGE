@@ -1,5 +1,6 @@
 import { getStories, normalizeCollection } from '@/lib/api';
 import { StoryCard } from '@/components/sections/StoryCard';
+import type { Story } from '@/types';
 
 export const revalidate = 3600;
 export const metadata = { title: 'Stories — GUGE' };
@@ -7,8 +8,8 @@ export const metadata = { title: 'Stories — GUGE' };
 export default async function StoriesPage() {
   const res = await getStories({ per_page: 50 });
 
-  const stories = normalizeCollection(res.data);
-  const [featured, ...rest] = stories;
+  const stories = normalizeCollection<Story>(res.data);
+  const [featured, ...rest] = stories as Story[];
 
   return (
     <div className="px-10 py-14">

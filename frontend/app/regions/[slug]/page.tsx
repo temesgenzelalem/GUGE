@@ -4,6 +4,8 @@ import { ProductCard } from '@/components/sections/ProductCard';
 import { StoryCard } from '@/components/sections/StoryCard';
 import { RegionTabs } from '@/components/sections/RegionTabs';
 import { notFound } from 'next/navigation';
+import { normalizeCollection } from '@/lib/api';
+import type { Product, Story } from '@/types';
 
 export const revalidate = 3600;
 
@@ -28,8 +30,8 @@ export default async function RegionPage({ params }: Props) {
   if (!regionRes) notFound();
 
   const region   = regionRes.data;
-  const products = normalizeCollection(productsRes.data);
-  const stories  = normalizeCollection(storiesRes.data);
+  const products = normalizeCollection<Product>(productsRes.data);
+  const stories  = normalizeCollection<Story>(storiesRes.data);
 
   return (
     <>
