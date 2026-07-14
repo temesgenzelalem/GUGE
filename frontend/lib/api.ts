@@ -14,7 +14,11 @@ const isServer = typeof window === 'undefined';
 const withFallback = async <T>(request: () => Promise<T>, fallback: T): Promise<T> => {
   try {
     return await request();
-  } catch {
+  } catch (err) {
+    // Log a lightweight warning for easier debugging during development
+    // Keep returning the fallback so builds and prerendering don't fail
+    // eslint-disable-next-line no-console
+    console.warn('[api] request failed, returning fallback', err);
     return fallback;
   }
 };
